@@ -24,7 +24,7 @@ def gather_sites(driver, zip, distance):
 
 driver = webdriver.Chrome()
 driver.get('https://www.macovidvaccines.com/')
-gather_sites(driver, "01748","35")
+gather_sites(driver, "01748","25")
 
 pattern = re.compile(r".*\d{1,2}\/\d{1,2}\/\d{2}: (\d{1,4}) slot.*")
 clickable_signup = "MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedSecondary"
