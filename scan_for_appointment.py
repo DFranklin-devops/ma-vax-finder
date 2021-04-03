@@ -27,7 +27,7 @@ driver.get('https://www.macovidvaccines.com/')
 gather_sites(driver, "01748","25")
 
 pattern = re.compile(r".*\d{1,2}\/\d{1,2}\/\d{2}: (\d{1,4}) slot.*")
-clickable_signup = "MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedSecondary"
+#clickable_signup = "MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedSecondary"
 
 #wrap_list = driver.find_element_by_xpath('//div[@id="progress"]/div[@class="loadedContent"]/div[@role="list"]')
 #print(len(wrap_list))
@@ -35,6 +35,7 @@ items = driver.find_elements_by_xpath('//div[@role="listitem"]')
 known_count = 0
 unk_count = 0
 known_list = []
+known_names = []
 unknown_list = []
 for item in items:
     for aline in item.text.splitlines():
@@ -42,37 +43,25 @@ for item in items:
         if match:
             known_count += int(match.group(1))
             known_list.append(item)
-#            try:
-#                item.find_element_by_xpath('.//a[@class="{}"]'.format(clickable_signup)).click()
-#            except:
-#                print("fail to find sign-up button for {}".format(item.text))
+            # the name of the location is identified by MuiCardHeader-title span class
+            known_names.append(item.find_element_by_xpath('.//span[contains(@class, "MuiCardHeader-title")]').text)
         elif re.compile(r".*isn't providing details.*").match(aline):
             unk_count += 1
             unknown_list.append(item)
-#            try:
-#                item.find_element_by_xpath('.//a[@class="{}"]'.format(clickable_signup)).click()
-#            except:
-#                print("fail to find sign-up button for {}".format(item.text))
-        # click sign up button
-
 
 print("--------------------------------------")
-print("Found {} slots in {} locations".format(str(len(known_list)), str(len(known_list)-len(unknown_list))))
+print("Found {} slots-locations".format(str(len(known_list))), end=": ")
+print(*known_names, sep=", ")
 print("Found {} locations with TBD slot count".format(str(len(unknown_list))))
 if len(known_list)+len(unknown_list):
     for site in known_list + unknown_list: #.extend(unknown_list):
         try:
-            site.find_element_by_xpath('.//a[@class="{}"]'.format(clickable_signup)).click()
+#            site.find_element_by_xpath('.//a[@class="{}"]'.format(clickable_signup)).click()
+            # signup button distinguished by class MuiButton-root
+            site.find_element_by_xpath('.//a[contains(@class, "MuiButton-root")]').click()
         except:
             print("fail to find sign-up button for {}".format(site.text))
     print("Subtabs have been opened")
+else:
+    driver.close()
 print("--------------------------------------")
-#    element_text = item.text
-#    element_attribute_value = item.get_attribute('total-available')
-
-#    print(item)
-#    print('element.text: {0}'.format(element_text))
-#    print("----------------------------------------------------------------")
-#    print('element.get_attribute(\'value\'): {0}'.format(element_attribute_value))
-
-#driver.close()
