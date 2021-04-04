@@ -2,16 +2,22 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import re
+import argparse
+import configparser
+
+allowed_dist = [5, 10, 25] # round any distance lower than each to the next one up
+any_dist = 9999 # this is considered 'any'
 
 
 """ gather list of hits from macovidvaccines site
   zip = string representing zip code
-  distance = string representing distance value ("any", "5", "10", "25")
+  distance = int representing distance value (-1 (=any), 5, 10, 25)
 """
 def gather_sites(driver, zip, distance):
-    if distance not in ["5", "10", "25"]:
-        distance = "9999" # this is considered 'any'
-    radio_elem_xp = "//input[@type='radio'][@value='{}']".format(distance)
+    # if distance not valid, make it 'any'
+    if distance not in allowed_dist:
+        distance = any_dist # this is considered 'any'
+    radio_elem_xp = "//input[@type='radio'][@value='{}']".format(str(distance))
     available_check = driver.find_element_by_name('onlyShowAvailable')
     if not available_check.is_selected():
         available_check.click()
@@ -22,9 +28,25 @@ def gather_sites(driver, zip, distance):
     apply_filt = driver.find_element_by_xpath("//button[contains(.,'Apply Filters')]")
     apply_filt.click()
 
+parser = argparse.ArgumentParser(description="Find available covid vaccine appointments in Massachusetts and open Chrome tabs to sign up for each")
+parser.add_argument('--zip', default='02134', type=ascii, help='five-digit zip code to search for')
+parser.add_argument('--distance', default=5, type=int, help='search distance (5, 10, 25, or -1 for any distance)')
+args=parser.parse_args()
+# args.zip
+# args.distance
+if args.distance == -1:
+    args.distance = any_dist # special case
+else:
+    # round up to next valid distance
+    for i in allowed_dist:
+        if args.distance <= i:
+            args.distance = i
+            break
+
+
 driver = webdriver.Chrome()
 driver.get('https://www.macovidvaccines.com/')
-gather_sites(driver, "01748","25")
+gather_sites(driver, args.zip, args.distance)
 
 pattern = re.compile(r".*\d{1,2}\/\d{1,2}\/\d{2}: (\d{1,4}) slot.*")
 #clickable_signup = "MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedSecondary"
