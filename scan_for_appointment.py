@@ -59,7 +59,7 @@ def send_notify(notify_config, message):
 # Arguments for zip and distance
 parser = argparse.ArgumentParser(description="Find available covid vaccine appointments in Massachusetts and open Chrome tabs to sign up for each")
 parser.add_argument('--zip', default='02134', type=ascii, help='five-digit zip code to search for')
-parser.add_argument('--distance', default=5, type=int, help='search distance (10, 25, 50, or -1 for any distance)')
+parser.add_argument('--distance', default=10, type=int, help='search distance (10, 25, 50, or -1 for any distance)')
 args=parser.parse_args()
 # args.zip
 # args.distance
