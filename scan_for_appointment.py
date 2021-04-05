@@ -101,9 +101,6 @@ for item in items:
     for aline in item.text.splitlines():
         match = pattern.match(aline)
         if match:
-            print(match.group(0))
-            print(match.group(1))
-#            print(match.group(2))
             known_count += int(match.group(1))
             known_list.append(item)
             # the name of the location is identified by MuiCardHeader-title span class
